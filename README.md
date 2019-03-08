@@ -9,7 +9,9 @@
 
 Google's Maps Javascript SDK gives us a default autocomplete experience, with a slightly customizable UI through class names; however, if we want to create a ground up search experience, we'll need to use their [REST API](https://developers.google.com/places/web-service/autocomplete). We want to do something like this:
 
-### demo here
+<p align="center">
+<img src="demo.gif" alt="demo" />
+</p>
 
 The two primary things we need to focus on are:
 
@@ -45,15 +47,28 @@ npm install use-google-autocomplete
 ```
 import useGoogleAutocomplete from 'use-google-autocomplete'
 
-// This will update each time a new `query` prop is passed.
-const { results, isLoading, error, getPlaceDetails } = useGoogleAutocomplete({
-  apiKey: '<API_KEY>',
-  query: 'New York',
-  options: {
-    types: '(cities)',
-  },
-})
+const App = () => {
 
+  // This will update each time a new `query` prop is passed.
+  const { results, isLoading, error, getPlaceDetails } = useGoogleAutocomplete({
+    apiKey: '<API_KEY>',
+    query: 'New York',
+    options: {
+      types: '(cities)',
+    },
+  })
+
+
+  return (
+    <ul>
+      {results.predictions.map(prediction => (
+        <li key={prediction.place_id}>
+          <Component prediction={prediction} />
+        </li>
+      })
+    </ul>
+  )
+}
 ```
 
 ## Props
@@ -61,6 +76,11 @@ const { results, isLoading, error, getPlaceDetails } = useGoogleAutocomplete({
 ### apiKey
 
 > String value of your Google API key. Make sure to enable the Maps API in your console.
+
+### type
+
+> String value of 'places' or 'query' | defaults to 'places'
+> This will determine if we use 'autocomplete' or 'queryautocomplete' ([reference](https://developers.google.com/places/web-service/autocomplete))
 
 ### query
 
@@ -91,7 +111,7 @@ const { results, isLoading, error, getPlaceDetails } = useGoogleAutocomplete({
 
 > Boolean | True when fetching Google API data
 
-### Error
+### error
 
 > Null or string value of the current error, if there is any.
 
