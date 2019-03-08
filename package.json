@@ -1,13 +1,13 @@
 {
   "name": "use-google-autocomplete",
   "version": "0.0.1",
-  "description": "A simple React Hook API that returns Google Autocomplete results with session_token handling.",
+  "description": "A tiny React Hook that returns Google Autocomplete results, with session_token handling.",
   "keywords": [
     "google maps",
     "maps places",
     "maps query",
     "react",
-    "hooks"
+    "hooks",
   ],
   "main": "lib/index.js",
   "dependencies": {

@@ -2,7 +2,7 @@
   use-google-autocomplete ⌨️
 </h1>
 <p align="center" style="font-size: 1.5rem;">
-  A simple React Hook API that returns Google Autocomplete results with session_token handling. 
+  A tiny React Hook that returns Google Autocomplete results with session_token handling. 
 </p>
 
 ## Problem
