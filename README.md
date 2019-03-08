@@ -7,7 +7,7 @@
 
 ## Problem
 
-Google's Maps Javascript SDK gives us a default autocomplete experience, with a slightly customizable UI through class names; however, if we want to create a ground up search experience, we'll need to use their [REST API](https://developers.google.com/places/web-service/autocomplete). We want to do something like this:
+Google's Maps Javascript SDK gives us a default autocomplete experience, with a slightly customizable UI through class names; however, if we want to create a ground up search experience, we'll need to use their [REST API](https://developers.google.com/places/web-service/autocomplete). We want to have a hook that does something like this:
 
 <p align="center">
 <img src="demo.gif" alt="demo" />
