@@ -1,0 +1,38 @@
+{
+  "name": "use-google-autocomplete",
+  "version": "0.0.1",
+  "description": "A simple React Hook API that returns Google Autocomplete results with session_token handling.",
+  "keywords": [
+    "google maps",
+    "maps places",
+    "maps query",
+    "react",
+    "hooks"
+  ],
+  "main": "lib/index.js",
+  "dependencies": {
+    "uuid": "^3.3.2"
+  },
+  "devDependencies": {
+    "@types/node": "^11.10.5",
+    "@types/react": "^16.8.6",
+    "@types/react-dom": "^16.8.2",
+    "react": "^16.8.3",
+    "react-dom": "^16.8.3",
+    "typescript": "^3.3.3333"
+  },
+  "scripts": {
+    "build": "rm -rf ./lib && tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/timc1/use-google-autocomplete.git"
+  },
+  "author": "Tim Chang <timchang.tcc@gmail.com> (https://timcchang.com)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/timc1/use-google-autocomplete/issues"
+  },
+  "homepage": "https://github.com/timc1/use-google-autocomplete#readme"
+}
