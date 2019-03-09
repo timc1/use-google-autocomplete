@@ -1,7 +1,7 @@
-import React from 'react'
+import * as React from 'react'
 import { AutocompleteProps } from '../index.d'
 // @ts-ignore
-import uuid4 from 'uuid/v4'
+import * as uuid4 from 'uuid/v4'
 
 const initialState = {
   results: [],

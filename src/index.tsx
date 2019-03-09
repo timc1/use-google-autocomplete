@@ -1,1 +1,1 @@
-export * from './use-google-places-autocomplete'
+export * from './use-google-autocomplete'
