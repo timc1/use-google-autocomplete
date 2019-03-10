@@ -1,6 +1,6 @@
 {
   "name": "use-google-autocomplete",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "A tiny React Hook that returns Google Autocomplete results, with session_token handling.",
   "keywords": [
     "google maps",

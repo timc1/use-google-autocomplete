@@ -61,9 +61,11 @@ export default function useGoogleAutocomplete({
     // Cancel previous debounced call.
     if (debouncedFn.current) debouncedFn.current.clear()
 
-    dispatch({
-      type: 'LOADING',
-    })
+    if (!state.isLoading) {
+      dispatch({
+        type: 'LOADING',
+      })
+    }
 
     debouncedFn.current = debounce(() => {
       const types =
@@ -83,7 +85,6 @@ export default function useGoogleAutocomplete({
       fetch(url, { signal: abortSignal.current })
         .then(data => data.json())
         .then(data => {
-          console.log('data', data)
           dispatch({
             type: data.status,
             payload: {
