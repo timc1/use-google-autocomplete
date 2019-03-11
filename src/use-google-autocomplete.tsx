@@ -4,7 +4,10 @@ import { AutocompleteProps } from '../index.d'
 import * as uuid4 from 'uuid/v4'
 
 const initialState = {
-  results: [],
+  results: {
+    predictions: [],
+    status: '',
+  },
   isLoading: false,
   error: null,
 }
@@ -32,18 +35,26 @@ export default function useGoogleAutocomplete({
   const abortController = React.useRef<any>()
   const abortSignal = React.useRef<any>()
 
+  const placesAbortController = React.useRef<any>()
+  const placesAbortSignal = React.useRef<any>()
+
   React.useEffect(() => {
     // Setup a timer to reset our session_token every 3 minutes.
     // Reference: (https://stackoverflow.com/questions/50398801/how-long-do-the-new-places-api-session-tokens-last/50452233#50452233)
     sessionTokenTimeout.current = window.setInterval(resetSessionToken, 180000)
-    // Setup an AbortController to cancel all http requests on unmount.
+    // Setup AbortControllers to cancel all http requests on unmount.
     abortController.current = new AbortController()
     abortSignal.current = abortController.current.signal
+    placesAbortController.current = new AbortController()
+    placesAbortSignal.current = placesAbortController.current.signal
+    // Setup an AbortController for our getPlacesDetails function
+    placesAbortController.current
 
     // Cleanup clearInterval and abort any http calls on unmount.
     return () => {
       clearInterval(sessionTokenTimeout.current)
       abortController.current.abort()
+      placesAbortController.current.abort()
     }
   }, [])
 
@@ -61,7 +72,7 @@ export default function useGoogleAutocomplete({
     // Cancel previous debounced call.
     if (debouncedFn.current) debouncedFn.current.clear()
 
-    if (!state.isLoading) {
+    if (!state.isLoading && !abortController.current.signal.aborted) {
       dispatch({
         type: 'LOADING',
       })
@@ -94,6 +105,11 @@ export default function useGoogleAutocomplete({
         })
         .catch(() => {
           // Component unmounted and API call cancelled.
+          // Reset AbortController.
+          if (abortController.current.signal.aborted) {
+            abortController.current = new AbortController()
+            abortSignal.current = abortController.current.signal
+          }
         })
     }, debounceMs)
 
@@ -119,37 +135,58 @@ export default function useGoogleAutocomplete({
       language?: string
     } = {}
   ) => {
-    const fields = placeDetailOptions.fields
-      ? `&fields=${placeDetailOptions.fields.join(',')}`
-      : ''
-    const region = placeDetailOptions.region
-      ? `&region=${placeDetailOptions.region}`
-      : ''
-    // If no options are passed, we'll default to closured language option.
-    const language = placeDetailOptions.language
-      ? `&language=${placeDetailOptions.language}`
-      : options.language
-      ? `&language=${options.language}}`
-      : ''
+    return new Promise(resolve => {
+      const fields = placeDetailOptions.fields
+        ? `&fields=${placeDetailOptions.fields.join(',')}`
+        : ''
+      const region = placeDetailOptions.region
+        ? `&region=${placeDetailOptions.region}`
+        : ''
+      // If no options are passed, we'll default to closured language option.
+      const language = placeDetailOptions.language
+        ? `&language=${placeDetailOptions.language}`
+        : options.language
+        ? `&language=${options.language}}`
+        : ''
 
-    const url = `${cors}https://maps.googleapis.com/maps/api/place/details/json?placeid=${placeId}${fields}${region}${language}&key=${apiKey}&sessiontoken=${
-      sessionToken.current
-    }`
+      const url = `${cors}https://maps.googleapis.com/maps/api/place/details/json?placeid=${placeId}${fields}${region}${language}&key=${apiKey}&sessiontoken=${
+        sessionToken.current
+      }`
 
-    return fetch(url, { signal: abortSignal.current })
-      .then(data => data.json())
-      .then(data => {
-        // Reset session token after we make a Place Details query.
-        resetSessionToken()
-        return data
-      })
-      .catch(() => {
-        // Component unmounted and API call cancelled.
-      })
+      fetch(url, { signal: placesAbortSignal.current })
+        .then(data => data.json())
+        .then(data => {
+          // Reset session token after we make a Place Details query.
+          resetSessionToken()
+          resolve(data)
+        })
+        .catch(() => {
+          // Component unmounted and API call cancelled.
+        })
+    })
   }
 
   const resetSessionToken = () => {
     sessionToken.current = uuid4()
+  }
+
+  // Exposes an additional method to cancel a query. Usage example would be
+  // when a user selects an option and you update the input field to reflect
+  // the change, calling 'cancelQuery' can cancel out the query that our hook
+  // will call again (since our input field changed).
+  //
+  // We can pass an addition predictions to just show the item we just selected.
+  const cancelQuery = (prediction: any) => {
+    if (abortController.current) abortController.current.abort()
+
+    dispatch({
+      type: 'OK',
+      payload: {
+        data: {
+          predictions: [prediction],
+        },
+      },
+    })
   }
 
   return {
@@ -157,6 +194,7 @@ export default function useGoogleAutocomplete({
     isLoading: state.isLoading,
     error: state.error,
     getPlaceDetails,
+    cancelQuery,
   }
 }
 
@@ -184,7 +222,9 @@ const reducer = (
     case 'ZERO_RESULTS':
       return {
         ...state,
-        results: [],
+        results: {
+          predictions: [],
+        },
         isLoading: false,
         error: null,
       }

@@ -16,10 +16,14 @@ export interface AutocompleteProps {
 }
 
 interface ReturnProps {
-  results: []
+  results: {
+    predictions: any[]
+    status: string
+  }
   isLoading: boolean
   error: null | string
   getPlaceDetails: any
+  cancelQuery: (id: string) => void
 }
 
 declare module 'use-google-autocomplete' {
