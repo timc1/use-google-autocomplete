@@ -72,6 +72,14 @@ export default function useGoogleAutocomplete({
     // Cancel previous debounced call.
     if (debouncedFn.current) debouncedFn.current.clear()
 
+    // If search length is 0, skip sending an API call.
+    if (query.length === 0) {
+      dispatch({
+        type: 'INVALID_REQUEST',
+      })
+      return
+    }
+
     if (!state.isLoading && !abortController.current.signal.aborted) {
       dispatch({
         type: 'LOADING',
@@ -226,7 +234,7 @@ const reducer = (
           predictions: [],
         },
         isLoading: false,
-        error: null,
+        error: `No results — try another input.`,
       }
     case 'INVALID_REQUEST':
       return {
@@ -238,7 +246,7 @@ const reducer = (
       return {
         ...state,
         isLoading: false,
-        error: `Invalid 'key' parameter`,
+        error: `Invalid 'key' parameter.`,
       }
     case 'UNKNOWN_ERROR':
       return {
